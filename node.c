@@ -5,6 +5,7 @@ const int KIDS_RESIZE_FACTOR = 2;
 
 node* node_init(int key, void* value){
     node* newNode = malloc(sizeof(node));
+    newNode->left = newNode->right = newNode;
     newNode->key = key;
     newNode->value = value;
     newNode->parent = NULL;
@@ -12,16 +13,7 @@ node* node_init(int key, void* value){
     newNode->kidsLogSize = 0;
     newNode->kidsPhySize = DEFAULT_KIDS_LEN;
     newNode->hasLostKid = 0;
-
     return newNode;
-}
-
-root* root_init(node* head){
-    root* newRoot = malloc(sizeof(root));
-    newRoot->tree = head;
-    newRoot->left = newRoot->right = newRoot;
-    newRoot->height = 1;
-    return newRoot;
 }
 
 void node_free(node* toFree){
@@ -49,27 +41,27 @@ void node_add_kid(node* parent, node* kid){
     parent->kidsLogSize++;
 }
 
-void  node_remove_kid(node* kidToRemove){
+node* node_remove_kid(node* kidToRemove){
     assert(kidToRemove);
     node* parent = kidToRemove->parent;
-    if (parent){
-        int slide = 0;
-        for (int i = 0; i < parent->kidsLogSize; i++){
-            if (parent->kids[i] == kidToRemove) slide = 1;
-            if(slide && i < parent->kidsLogSize -1){
-                parent->kids[i] = parent->kids[i+1];
-            }
-        }
-        assert(slide);
-        parent->kidsLogSize--;
-        parent->kids[parent->kidsLogSize] = NULL;
-        if (parent->hasLostKid){
-            parent->hasLostKid = 0;
-            node_remove_kid(parent);
-        }else{
-            parent->hasLostKid = 1;
+    assert(parent);
+    int slide = 0;
+    for (int i = 0; i < parent->kidsLogSize; i++){
+        if (parent->kids[i] == kidToRemove) slide = 1;
+        if(slide && i < parent->kidsLogSize -1){
+            parent->kids[i] = parent->kids[i+1];
         }
     }
+    assert(slide);
+    parent->kidsLogSize--;
+    parent->kids[parent->kidsLogSize] = NULL;
+    if (parent->hasLostKid){
+        parent->hasLostKid = 0;
+        return parent;
+    }else{
+        parent->hasLostKid = 1;
+    }
+    return NULL;
 }
 
 node* node_remove_right_kid(node* parent){
@@ -82,8 +74,8 @@ node* node_remove_right_kid(node* parent){
     return kid;
 }
 
-void root_add(root* old, root* newRight){
-    root* oldRight = old->right;
+void node_add(node* old, node* newRight){
+    node* oldRight = old->right;
     old->right = newRight;
     oldRight->left = newRight;
     newRight->left = old;

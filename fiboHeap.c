@@ -7,45 +7,42 @@
 #include "node.h"
 
 //for reference
-//typedef root heap;
+//typedef node heap;
 //typedef node elem;
 
 heap* heap_init(){
     return NULL;
 }
 
-elem* heap_add(heap** H, root* newRoot);
+elem* heap_add(heap** H, node* newNode);
 
 elem* heap_insert(heap** H, int key, void* value){
-    root* newRoot = root_init(node_init(key, value));
-    return heap_add(H, newRoot);
+    node* newNode = node_init(key, value);
+    return heap_add(H, newNode);
 }
 
-elem* heap_add(heap** H, root* newRoot){
+elem* heap_add(heap** H, node* newNode){
     assert(H);
-    assert(newRoot);
-    root* oldRoot = *H;
-    if (oldRoot){
-        assert(oldRoot->tree);
-        assert(oldRoot->tree->key);
-        assert(newRoot->tree);
-        assert(newRoot->tree->key);
-        if (oldRoot->tree->key > newRoot->tree->key){ //new smallest
-            root_add(oldRoot->left, newRoot);
-            *H = newRoot;
+    assert(newNode);
+    node* oldNode = *H;
+    newNode->parent = NULL;
+    if (oldNode){
+        if (oldNode->key > newNode->key){ //new smallest
+            node_add(oldNode->left, newNode);
+            *H = newNode;
         }else{ //just another node
-            root_add(oldRoot, newRoot);
+            node_add(oldNode, newNode);
         }
-    }else{ //previously empty tree
-        *H = newRoot;
+    }else{ //previously empty heap
+        *H = newNode;
     }
-    return newRoot->tree;
+    return newNode;
 }
 
 data  heap_min(heap* H){
     assert(H);
     data d;
-    node* head = H->tree;
+    node* head = H;
     d.key = head->key;
     d.value = head->value;
     return d;
@@ -60,10 +57,10 @@ heap* heap_union(heap* H1, heap* H2){
         return heap_union(H2, H1);
     }
 
-    root* H1first = H1;
-    root* H1last = H1first->left;
-    root* H2first = H2;
-    root* H2last = H2first->left;
+    node* H1first = H1;
+    node* H1last = H1first->left;
+    node* H2first = H2;
+    node* H2last = H2first->left;
 
     H1last->right = H2first;
     H2first->left = H1last;
@@ -75,13 +72,23 @@ heap* heap_union(heap* H1, heap* H2){
 
 void  heap_decrease_key(heap** H, elem* x, int newKey){
     assert(H && *H);
-    assert(x && x->key > newKey);
-    node_remove_kid(x);
+    assert(x && x->key >= newKey);
     x->key = newKey;
-    fprintf(stderr, "Assigned key.\n");
-    //problem: what if you're already a root?
-    heap_add(H, root_init((node*)x));
-    fprintf(stderr, "Returing.\n");
+    if(*H != x){ //don't touch the root
+        node* x2 = NULL;
+        if(x->parent){//in a tree
+            x2 = node_remove_kid(x);
+        }else{//on the ring
+            assert(x->left && x->right);
+            assert(x->left != x && x->right != x);
+            x->left->right = x->right;
+            x->right->left = x->left;
+        }
+        heap_add(H, x);
+        if (x2){
+            heap_decrease_key(H, x2, x2->key);
+        }
+    }
 }
 
 void  heap_delete(heap** H, elem* x);
@@ -95,12 +102,12 @@ data  elem_data(elem* x){
 }
 
 void heap_free(heap** H){
-    root* header = *H;
-    root* first = header;
+    node* header = *H;
+    node* first = header;
     if (header){
         while(header != first){
-            root* next = header->right;
-            node_kill(header->tree);
+            node* next = header->right;
+            node_kill(header);
             header = next;
         }
     }
