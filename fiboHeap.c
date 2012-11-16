@@ -2,6 +2,7 @@
 #ifdef  USE_FIBO_HEAP
 
 #include <stdio.h>
+#include <assert.h>
 #include "heap.h"
 #include "node.h"
 
@@ -10,7 +11,6 @@
 //typedef node elem;
 
 heap* heap_init(){
-    printf("Returning NULL");
     return NULL;
 }
 
@@ -20,17 +20,18 @@ elem* heap_insert(heap** H, int key, void* value){
     if (oldRoot){
         if (oldRoot->tree->key > key){
             root_add(oldRoot->left, newRoot);
-            oldRoot = newRoot;
+            *H = newRoot;
         }else{
             root_add(oldRoot, newRoot);
         }
     }else{
-        oldRoot = newRoot;
+        *H = newRoot;
     }
     return newRoot->tree;
 }
 
 data  heap_min(heap* H){
+    assert(H);
     data d;
     node* head = ((root*) H)->tree;
     d.key = head->key;

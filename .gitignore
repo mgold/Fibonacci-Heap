@@ -12,7 +12,7 @@
 *.dylib
 
 # Executables
-fiboHeap
+run
 *.exe
 *.out
 *.app
