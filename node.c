@@ -16,9 +16,9 @@ node* node_init(int key, void* value){
     return newNode;
 }
 
-root* root_init(int key, void* value){
+root* root_init(node* head){
     root* newRoot = malloc(sizeof(root));
-    newRoot->tree = node_init(key, value);
+    newRoot->tree = head;
     newRoot->left = newRoot->right = newRoot;
     newRoot->height = 1;
     return newRoot;
@@ -36,7 +36,7 @@ void node_kill(node* toKill){
     node_free(toKill);
 }
 
-void node_addKid(node* parent, node* kid){
+void node_add_kid(node* parent, node* kid){
     if (parent->kidsPhySize == parent->kidsLogSize){
         node** newKids = calloc(KIDS_RESIZE_FACTOR*parent->kidsPhySize,
                                 sizeof(node*));
@@ -49,7 +49,30 @@ void node_addKid(node* parent, node* kid){
     parent->kidsLogSize++;
 }
 
-node* node_removeKid(node* parent){
+void  node_remove_kid(node* kidToRemove){
+    assert(kidToRemove);
+    node* parent = kidToRemove->parent;
+    if (parent){
+        int slide = 0;
+        for (int i = 0; i < parent->kidsLogSize; i++){
+            if (parent->kids[i] == kidToRemove) slide = 1;
+            if(slide && i < parent->kidsLogSize -1){
+                parent->kids[i] = parent->kids[i+1];
+            }
+        }
+        assert(slide);
+        parent->kidsLogSize--;
+        parent->kids[parent->kidsLogSize] = NULL;
+        if (parent->hasLostKid){
+            parent->hasLostKid = 0;
+            node_remove_kid(parent);
+        }else{
+            parent->hasLostKid = 1;
+        }
+    }
+}
+
+node* node_remove_right_kid(node* parent){
     node* kid = NULL;
     if (parent->kidsLogSize){
         kid = parent->kids[parent->kidsLogSize-1];
