@@ -33,7 +33,7 @@ done
 # link together .o files + libraries to make executable binaries
 # using one case statement per executable binary
 case $link in
-  all) gcc $FLAGS -o fiboHeap main.o
+  all) gcc $FLAGS -o fiboHeap *.o
               linked=yes ;;
 esac
 

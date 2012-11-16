@@ -22,13 +22,18 @@ struct node{
 typedef struct root root;
 struct root{
     node* tree;
+    int height; //In nodes, not edges
     root* left;
     root* right;
 };
 
+typedef root heap;
+typedef node elem;
+
 //Don't pass any NULL pointers to these functions. Just don't.
 
 node* node_init(int key, void* value);
+root* root_init(int key, void* value);
 
 //node_free deallocates the node. Will leak memory and leave dead pointers.
 //node_kill recursively kills its children and then frees itself.

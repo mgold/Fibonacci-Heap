@@ -16,3 +16,6 @@ fiboHeap
 *.exe
 *.out
 *.app
+
+# Cores
+core.[0-9]*

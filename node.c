@@ -16,6 +16,14 @@ node* node_init(int key, void* value){
     return newNode;
 }
 
+root* root_init(int key, void* value){
+    root* newRoot = malloc(sizeof(root));
+    newRoot->tree = node_init(key, value);
+    newRoot->left = newRoot->right = newRoot;
+    newRoot->height = 1;
+    return newRoot;
+}
+
 void node_free(node* toFree){
     free(toFree->kids);
     free(toFree);
