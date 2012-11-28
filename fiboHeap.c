@@ -26,6 +26,7 @@ elem* heap_add(heap** H, node* newNode){
     assert(newNode);
     node* oldNode = *H;
     newNode->parent = NULL;
+    newNode->hasLostKid = 0;
     if (oldNode){
         if (oldNode->key > newNode->key){ //new smallest
             node_add(oldNode->left, newNode);
@@ -74,19 +75,24 @@ void  heap_decrease_key(heap** H, elem* x, int newKey){
     assert(H && *H);
     assert(x && x->key >= newKey);
     x->key = newKey;
-    if(*H != x){ //don't touch the root
-        node* x2 = NULL;
-        if(x->parent){//in a tree
-            x2 = node_remove_kid(x);
-        }else{//on the ring
-            assert(x->left && x->right);
-            assert(x->left != x && x->right != x);
+    if(x->parent && x->parent->key > newKey){
+        if (x->left == x){
+            x->parent->kid = NULL;
+        }else{
             x->left->right = x->right;
             x->right->left = x->left;
+            x->parent->kid = x->left;
         }
         heap_add(H, x);
-        if (x2){
-            heap_decrease_key(H, x2, x2->key);
+        if (! x->parent->hasLostKid){
+            x->parent->hasLostKid = 1;
+        }else{
+            heap_decrease_key(H, x->parent, x->parent->key);
+        }
+
+    }else{
+        if (newKey < (*H)->key){
+            *H = x;
         }
     }
 }
