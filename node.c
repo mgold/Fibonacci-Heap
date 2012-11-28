@@ -8,6 +8,7 @@ node* node_init(int key, void* value){
     newNode->parent = NULL;
     newNode->kid = NULL;
     newNode->hasLostKid = 0;
+    newNode->degree = 0;
     return newNode;
 }
 

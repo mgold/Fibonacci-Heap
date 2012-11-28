@@ -17,6 +17,7 @@ struct node{
   int key;
   void* value; // Arbitrary heap client data
   int hasLostKid; //Boolean, aka "mark"
+  int degree; //number of kids
 };
 
 typedef node heap;

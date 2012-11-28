@@ -77,12 +77,15 @@ void  heap_decrease_key(heap** H, elem* x, int newKey){
     x->key = newKey;
     if(x->parent && x->parent->key > newKey){
         if (x->left == x){
+            assert(x->degree == 1);
             x->parent->kid = NULL;
         }else{
+            assert(x->degree > 1);
             x->left->right = x->right;
             x->right->left = x->left;
             x->parent->kid = x->left;
         }
+        x->parent->degree--;
         heap_add(H, x);
         if (! x->parent->hasLostKid){
             x->parent->hasLostKid = 1;
