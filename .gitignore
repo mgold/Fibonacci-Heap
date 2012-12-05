@@ -19,3 +19,6 @@ run
 
 # Cores
 core.[0-9]*
+
+# Logs
+*.log

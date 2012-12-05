@@ -21,6 +21,10 @@ elem* heap_insert(heap** H, int key, void* value){
     return heap_add(H, newNode);
 }
 
+int is_empty(heap* H){
+    return H == NULL;
+}
+
 elem* heap_add(heap** H, node* newNode){
     assert(H);
     assert(newNode);
@@ -49,7 +53,92 @@ data  heap_min(heap* H){
     return d;
 }
 
-data  heap_extract_min(heap** H);
+void  heap_consolidate(heap** H);
+node* heap_link(heap** H, node* x, node* y);
+void  heap_remove_from(heap** H, node* x);
+
+data  heap_extract_min(heap** H){
+    assert(H && *H);
+    node* z = *H;
+    data d = elem_data(z);
+    node* first = z->kid;
+    node* current = first;
+    heap_remove_from(H, z);
+    node_free(z);
+    if (first){
+        while (current != first){
+            current->parent = NULL;
+            current = current->right;
+        }
+        first->parent = NULL;
+        *H = heap_union(*H, first);
+    }
+    heap_consolidate(H);
+    return d;
+}
+
+void  heap_remove_from(heap** H, node* x){
+    if (x->right == x){
+        *H = NULL;
+    }else{
+        x->left->right = x->right;
+        x->right->left = x->left;
+        *H = x->right;
+    }
+    x->left = x;
+    x->right = x;
+    x->parent = NULL;
+}
+void  heap_consolidate(heap** H){
+    node** A = calloc(100, sizeof(node));
+    memset(A, '\0', 100);
+    node* first = *H;
+    node* x = first;
+    A[x->degree] = x;
+    x = x->right;
+    while(x != first){
+        node* next = x->right;
+        int d = x->degree;
+        while(A[d]){
+            x = heap_link(H, x, A[d]);
+            A[d] = NULL;
+            d++;
+        }
+        A[d] = x;
+        x = next;
+    }
+    *H = heap_init();
+    for (int i=0; i<100; i++){
+        if (A[i]){
+            heap_add(H, A[i]);
+        }
+    }
+    free(A);
+}
+
+node* heap_link(heap** H, node* x, node* y){
+    assert(x);
+    assert(y);
+    heap_print(*H);
+    if (x->key > y->key){
+        return heap_link(H, y, x);
+    }
+    heap_remove_from(H, y);
+    if (x->kid){
+        node* z = x->kid;
+        y->right = z;
+        z->left = y;
+        y->left = z->left;
+        z->left->right = y;
+    }
+    y->parent = x;
+    x->kid = y;
+    x->degree++;
+    y->hasLostKid = 0;
+    heap_print(*H);
+    fprintf(stderr, "\n");
+    return x;
+}
 
 heap* heap_union(heap* H1, heap* H2){
     if(!H1) return H2;
@@ -77,10 +166,10 @@ void  heap_decrease_key(heap** H, elem* x, int newKey){
     x->key = newKey;
     if(x->parent && x->parent->key > newKey){
         if (x->left == x){
-            assert(x->degree == 1);
+            assert(x->parent->degree == 2);
             x->parent->kid = NULL;
         }else{
-            assert(x->degree > 1);
+            assert(x->parent->degree > 2);
             x->left->right = x->right;
             x->right->left = x->left;
             x->parent->kid = x->left;
@@ -120,6 +209,23 @@ void heap_free(heap** H){
             header = next;
         }
     }
+}
+
+void heap_print(heap* H){
+    if (H){
+        node* first = H;
+        fprintf(stderr, "%d(", first->key);
+        if(first->kid) heap_print(first->kid);
+        fprintf(stderr, ")");
+        node* current = first->right;
+        while (first != current){
+            fprintf(stderr, "%d(", current->key);
+            if(current->kid) heap_print(current->kid);
+            fprintf(stderr, ")");
+            current = current->right;
+        }
+    }
+    fprintf(stderr, "\n");
 }
 
 #endif

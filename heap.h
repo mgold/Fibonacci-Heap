@@ -19,10 +19,12 @@ typedef struct{
 //Functions that take a heap** may change that pointer by side effect
 
 heap* heap_init();
+int is_empty(heap* H);
 
 //Returns a pointer to the element inserted, for decrease_key and delete
 elem* heap_insert(heap** H, int key, void* value);
 
+//Don't call either of these on the empty heap
 data  heap_min(heap* H);
 data  heap_extract_min(heap** H);
 
@@ -35,6 +37,8 @@ void  heap_delete(heap** H, elem* x);
 
 data  elem_data(elem* x);
 void  elem_set_value(elem* x, void* newValue);
+
+void heap_print(heap* H);
 
 //Call to avoid leaking memory.
 void heap_free(heap** H);

@@ -1,12 +1,23 @@
 #include <stdio.h>
 #include "heap.h"
 
+void print_data(data d){
+    printf("%d\n", d.key);
+}
+
 int main(){
     heap* myheap = heap_init();
-    elem* seven = heap_insert(&myheap, 7, NULL);
     heap_insert(&myheap, 3, NULL);
-    heap_decrease_key(&myheap, seven, 2);
-    data d = heap_min(myheap);
+    heap_insert(&myheap, 8, NULL);
+    heap_insert(&myheap, 2, NULL);
+    heap_insert(&myheap, 6, NULL);
+    heap_insert(&myheap, 1, NULL);
+    heap_insert(&myheap, 9, NULL);
+    heap_print(myheap);
+    print_data(heap_extract_min(&myheap));
+    print_data(heap_extract_min(&myheap));
+    //while (!is_empty(myheap)){
+    //}
     heap_free(&myheap);
-    return d.key;
+    return 0;
 }
