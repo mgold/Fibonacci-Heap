@@ -100,8 +100,15 @@ void  heap_consolidate(heap** H){
         node* next = x->right;
         int d = x->degree;
         while(A[d]){
-            x = heap_link(H, x, A[d]);
-            A[d] = NULL;
+            if (d > 90){
+                fprintf(stderr, "Bad d: %d on node %d", d, x->key);
+                exit(1);
+            }
+            node* y = A[d];
+            if (y != x){
+                x = heap_link(H, x, y);
+                A[d] = NULL;
+            }
             d++;
         }
         A[d] = x;
@@ -119,17 +126,18 @@ void  heap_consolidate(heap** H){
 node* heap_link(heap** H, node* x, node* y){
     assert(x);
     assert(y);
-    heap_print(*H);
     if (x->key > y->key){
         return heap_link(H, y, x);
     }
+    heap_print(*H);
+    fprintf(stderr, "x: %d y: %d\n", x->key, y->key);
     heap_remove_from(H, y);
     if (x->kid){
         node* z = x->kid;
         y->right = z;
-        z->left = y;
         y->left = z->left;
         z->left->right = y;
+        z->left = y;
     }
     y->parent = x;
     x->kid = y;
@@ -214,12 +222,12 @@ void heap_free(heap** H){
 void heap_print(heap* H){
     if (H){
         node* first = H;
-        fprintf(stderr, "%d(", first->key);
+        fprintf(stderr, "%d[%d](", first->key, first->degree);
         if(first->kid) heap_print(first->kid);
         fprintf(stderr, ")");
         node* current = first->right;
         while (first != current){
-            fprintf(stderr, "%d(", current->key);
+            fprintf(stderr, "%d[%d](", current->key, current->degree);
             if(current->kid) heap_print(current->kid);
             fprintf(stderr, ")");
             current = current->right;
