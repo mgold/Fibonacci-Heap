@@ -31,12 +31,10 @@ elem* heap_add(heap** H, node* newNode){
     node* oldNode = *H;
     newNode->parent = NULL;
     newNode->hasLostKid = 0;
-    if (oldNode){
+    if (oldNode){ //nonempty heap
+        node_add(oldNode, newNode);
         if (oldNode->key > newNode->key){ //new smallest
-            node_add(oldNode->left, newNode);
             *H = newNode;
-        }else{ //just another node
-            node_add(oldNode, newNode);
         }
     }else{ //previously empty heap
         *H = newNode;
@@ -73,6 +71,8 @@ data  heap_extract_min(heap** H){
         }
         first->parent = NULL;
         *H = heap_union(*H, first);
+        fprintf(stderr, "After union\n");
+        heap_print(*H);
     }
     heap_consolidate(H);
     return d;
@@ -91,11 +91,12 @@ void  heap_remove_from(heap** H, node* x){
     x->right = x;
 }
 void  heap_consolidate(heap** H){
+    fprintf(stderr, "Entering consolidate\n");
     node** A = calloc(100, sizeof(node));
     memset(A, '\0', 100);
     node* x = *H;
+    assert(x->degree >= 0);
     node* last = x->left;
-    x = x->right;
     while(x != last){
         node* next = x->right;
         heap_match_degrees(H, A, x);
@@ -108,7 +109,12 @@ void  heap_consolidate(heap** H){
             heap_add(H, A[i]);
         }
     }
+    fprintf(stderr, "ll, l, x, r rr rrr: %d %d %d %d %d %d\n",
+        x->left->left->key, x->left->key, x->key, x->right->key,
+        x->right->right->key, x->right->right->right->key); 
     free(A);
+    heap_print(*H);
+    fprintf(stderr, "Exiting consolidate\n");
 }
 
 void heap_match_degrees(heap** H, node** A, node* x){
