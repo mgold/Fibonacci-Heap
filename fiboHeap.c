@@ -63,10 +63,10 @@ data  heap_extract_min(heap** H){
     node* z = *H;
     data d = elem_data(z);
     node* first = z->kid;
-    node* current = first;
     heap_remove_from(H, z);
     node_free(z);
     if (first){
+        node* current = first->right;
         while (current != first){
             current->parent = NULL;
             current = current->right;
@@ -89,6 +89,7 @@ void  heap_remove_from(heap** H, node* x){
     }
     x->left = x;
     x->right = x;
+    x->parent = NULL;
 }
 void  heap_consolidate(heap** H){
     node* x = *H;
@@ -103,11 +104,6 @@ void  heap_consolidate(heap** H){
         x = next;
     }
     heap_match_degrees(H, A, last);
-    for (int i=0; i<100; i++){
-        if (A[i]){
-        }else{
-        }
-    }
     *H = heap_init();
     for (int i=0; i<100; i++){
         if (A[i]){
@@ -200,6 +196,7 @@ void  heap_decrease_key(heap** H, elem* x, int newKey){
 
     }else{
         if (newKey < (*H)->key){
+            assert(!x->parent);
             *H = x;
         }
     }
