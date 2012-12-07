@@ -14,10 +14,9 @@ int main(){
     heap_insert(&myheap, 1, NULL);
     heap_insert(&myheap, 9, NULL);
     heap_print(myheap);
-    print_data(heap_extract_min(&myheap));
-    print_data(heap_extract_min(&myheap));
-    //while (!is_empty(myheap)){
-    //}
+    while (!is_empty(myheap)){
+        print_data(heap_extract_min(&myheap));
+    }
     heap_free(&myheap);
     return 0;
 }

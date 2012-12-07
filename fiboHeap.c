@@ -54,6 +54,7 @@ data  heap_min(heap* H){
 }
 
 void  heap_consolidate(heap** H);
+void  heap_match_degrees(heap** H, node** A, node* x);
 node* heap_link(heap** H, node* x, node* y);
 void  heap_remove_from(heap** H, node* x);
 
@@ -78,6 +79,7 @@ data  heap_extract_min(heap** H){
 }
 
 void  heap_remove_from(heap** H, node* x){
+    assert(!x->parent);
     if (x->right == x){
         *H = NULL;
     }else{
@@ -87,33 +89,19 @@ void  heap_remove_from(heap** H, node* x){
     }
     x->left = x;
     x->right = x;
-    x->parent = NULL;
 }
 void  heap_consolidate(heap** H){
     node** A = calloc(100, sizeof(node));
     memset(A, '\0', 100);
-    node* first = *H;
-    node* x = first;
-    A[x->degree] = x;
+    node* x = *H;
+    node* last = x->left;
     x = x->right;
-    while(x != first){
+    while(x != last){
         node* next = x->right;
-        int d = x->degree;
-        while(A[d]){
-            if (d > 90){
-                fprintf(stderr, "Bad d: %d on node %d", d, x->key);
-                exit(1);
-            }
-            node* y = A[d];
-            if (y != x){
-                x = heap_link(H, x, y);
-                A[d] = NULL;
-            }
-            d++;
-        }
-        A[d] = x;
+        heap_match_degrees(H, A, x);
         x = next;
     }
+    heap_match_degrees(H, A, last);
     *H = heap_init();
     for (int i=0; i<100; i++){
         if (A[i]){
@@ -123,14 +111,33 @@ void  heap_consolidate(heap** H){
     free(A);
 }
 
+void heap_match_degrees(heap** H, node** A, node* x){
+    int d = x->degree;
+    while(A[d]){
+        if (d > 90){
+            fprintf(stderr, "Bad d: %d on node %d", d, x->key);
+            exit(1);
+        }
+        node* y = A[d];
+        if (y != x){
+            x = heap_link(H, x, y);
+            A[d] = NULL;
+            d++;
+        }else{
+            break;
+        }
+    }
+    A[d] = x;
+}
 node* heap_link(heap** H, node* x, node* y){
     assert(x);
     assert(y);
+    assert(x->degree == y->degree);
     if (x->key > y->key){
         return heap_link(H, y, x);
     }
     heap_print(*H);
-    fprintf(stderr, "x: %d y: %d\n", x->key, y->key);
+    fprintf(stderr, "x: %d[%d] y: %d[%d]\n", x->key, x->degree, y->key, y->degree);
     heap_remove_from(H, y);
     if (x->kid){
         node* z = x->kid;
