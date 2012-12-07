@@ -222,23 +222,9 @@ void heap_free(heap** H){
             header = next;
         }
     }
+    *H = NULL;
 }
 
-void heap_print(heap* H){
-    if (H){
-        node* first = H;
-        fprintf(stderr, "%d[%d](", first->key, first->degree);
-        if(first->kid) heap_print(first->kid);
-        fprintf(stderr, ")");
-        node* current = first->right;
-        while (first != current){
-            fprintf(stderr, "%d[%d](", current->key, current->degree);
-            if(current->kid) heap_print(current->kid);
-            fprintf(stderr, ")");
-            current = current->right;
-        }
-    }
-    fprintf(stderr, "\n");
-}
-
+#else
+int dummy = 1;
 #endif

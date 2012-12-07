@@ -5,15 +5,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "use.h"
-#ifdef  USE_FIBO_HEAP
-#include "node.h"
-#endif
-
 typedef struct{
     int key;     // Indicates the minimum
     void* value; //Arbitrary client data
 } data;
+
+#include "use.h"
+#ifdef  USE_FIBO_HEAP
+#include "node.h"
+#else
+typedef data elem;
+
+typedef struct{
+    int phySize;
+    int logSize;
+    elem** A;
+} array;
+
+typedef array heap;
+#endif
 
 //These functions are follow the same contracts listed on text page 505
 //Functions that take a heap** may change that pointer by side effect
@@ -37,8 +47,6 @@ void  heap_delete(heap** H, elem* x);
 
 data  elem_data(elem* x);
 void  elem_set_value(elem* x, void* newValue);
-
-void heap_print(heap* H);
 
 //Call to avoid leaking memory.
 void heap_free(heap** H);

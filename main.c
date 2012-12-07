@@ -7,15 +7,23 @@ void print_data(data d){
 
 int main(){
     heap* myheap = heap_init();
-    for (int i = 100; i>0; i-=2){
+
+    int maxKey = 100000; //100 to 100 thousand by power of 10
+    for (int i = 0; i<maxKey; i+=5){
         heap_insert(&myheap, i, NULL);
     }
-    elem* mine = heap_insert(&myheap, 77, NULL);
-    heap_decrease_key(&myheap, mine, 33);
-    mine = heap_insert(&myheap, 67, NULL);
-    heap_decrease_key(&myheap, mine, 23);
-    mine = heap_insert(&myheap, 43, NULL);
-    heap_delete(&myheap, mine);
+    for (int i = 1; i<maxKey; i+=5){
+        heap_insert(&myheap, i, NULL);
+    }
+    for (int i = 2; i<maxKey; i+=5){
+        heap_insert(&myheap, i, NULL);
+    }
+    for (int i = 3; i<maxKey; i+=5){
+        heap_insert(&myheap, i, NULL);
+    }
+    for (int i = 4; i<maxKey; i+=5){
+        heap_insert(&myheap, i, NULL);
+    }
     while (!is_empty(myheap)){
         print_data(heap_extract_min(&myheap));
     }

@@ -1,0 +1,101 @@
+% There are different document classes for different types
+% of structures, e.g. books, articles, and letters.
+\documentclass{article}
+
+\usepackage{graphicx}
+\usepackage{enumerate}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{rotating}
+\setlength{\headheight}{15pt}
+\pagestyle{fancyplain}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2ex}
+
+\lhead{\fancyplain{}{Programming Assignment}}
+\chead{Max Goldstein \\ COMP 160, Fall 2012}
+\rhead{Page \thepage}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+
+\begin{document}
+
+\section{Overview}
+
+I implemented a Fibonacci Heap in C, as well as a naive heap using an unsorted
+dynamic array. Originally I wanted to run a complete shortest path simulation to
+test both heaps, but I ran out of time. Instead I tested the heaps on a very
+large amount of simple numeric data.
+
+\section{The Code} The implementation is constructed to allow toggling between
+the Fibonacci and naive heaps by commenting out one preprocessor directive,
+located and explained in use.h. Both heaps use the same interface, heap.h. The
+code for the Fibonacci heap is located in fiboHeap.c and node.[h,c], while the
+naive heap is contained entirely in naiveHeap.c. Testing code, which is heap
+implementation-agnostic, is located in main.c. A compile script is provided that
+generates an executable called run; neither require arguments. It is recommended
+to pipe stdout to a file when running.
+
+Both heaps require a key of int type and a value of void* type, which can be
+arbitrary client data. The value can be used to run a shortest path algorithm.
+None of my tests use it.
+
+\section{Testing}
+As can be seen in main.c, I resorted to using loops to spray out hundreds of
+thousands of numbers and insert them into the heap. I did make sure to
+intersperse the keys. I also tested the decrease key operation, but this takes
+constant time in both implementations so I omitted it in final testing. Instead
+I opted to plot heaps of different sizes and then empty them, effectively
+heapsort.
+
+Testing was done with output piped to files. The files produced were identical,
+and vetted against a known-sorted file produced by a trivial Python script. I
+used the standard time utility, and report the ``real" time. Testing was done on
+an (old) Halligan 120 quad-core.  Originally I wanted to run each test 8 times
+and provide mean and standard deviation results. However when I ran the tests
+performance improved with successive runs, especially for the Fibonacci heap,
+which I attribute to a ``warmed-up" cache. So instead I used the last time for
+those 8 trials, for each input size. My test script is also provided. I tested
+at powers of ten between 100 and 100 thousand.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=3.5in]{chart.jpg}
+  \caption{Results for Naive and Fibonacci heapsort. Note the log-log scale.
+  Lines are interpolated for visibility; testing was done at powers of ten only.}
+\label{fig:results}
+\end{figure} 
+
+As expected, the Fibonacci heap is asymptotically superior, running two orders
+of magnitude faster than than the naive heap for 100 thousand elements. I didn't
+test any higher because I didn't want to wait on the naive implementation, but
+the Fibonacci heap handles a million elements in 1.2 seconds. That's an
+order of magnitude faster than the other algorithm on an order of magnitude more
+data.
+
+The Fibonacci heap is actually slower for small datasets due to its larger
+overhead, but even then it runs almost instantly.
+
+\section{Analysis}
+The struggle between asymptotic performance and ``real-world" performance is
+ongoing. On one hand, thanks to Moore's law we have far more cycles to throw at
+a problem than ever before. On the other, ``big data" now exists on the petabyte
+scale. This assignment made it clear to me that even on a fairly powerful
+workstation, a naive algorithm just doesn't cut it for large data.
+
+More concretely, I this assignment made amortized analysis easier to grasp. All
+Fibonacci heap times are amortized. Heapsort requires $\Theta(n)$ extract\_min
+operations, which are $O(\log n)$ time. However, because the operations are
+sequential, the potential of the heap remains low after the first call.
+Subsequent extractions go much faster because the heap is already organized. In
+fact, we can say that on a consecutive extraction, only two trees have equal
+degrees: the subtree of the min just extracted and the tree formerly of that
+height. This bounds the amount of work that must be done.
+
+\end{document}
