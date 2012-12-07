@@ -2,13 +2,10 @@
 #ifdef  USE_FIBO_HEAP
 
 #include <stdio.h>
+#include <limits.h>
 #include <assert.h>
 #include "heap.h"
 #include "node.h"
-
-//for reference
-//typedef node heap;
-//typedef node elem;
 
 heap* heap_init(){
     return NULL;
@@ -202,7 +199,10 @@ void  heap_decrease_key(heap** H, elem* x, int newKey){
     }
 }
 
-void  heap_delete(heap** H, elem* x);
+void  heap_delete(heap** H, elem* x){
+    heap_decrease_key(H, x, INT_MIN);
+    heap_extract_min(H);
+}
 
 data  elem_data(elem* x){
     assert(x);

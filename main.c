@@ -7,16 +7,15 @@ void print_data(data d){
 
 int main(){
     heap* myheap = heap_init();
-    heap_insert(&myheap, 3, NULL);
-    heap_insert(&myheap, 8, NULL);
-    heap_insert(&myheap, 2, NULL);
-    heap_insert(&myheap, 5, NULL);
-    heap_insert(&myheap, 6, NULL);
-    heap_insert(&myheap, 1, NULL);
-    heap_insert(&myheap, 9, NULL);
-    heap_insert(&myheap, 4, NULL);
-    heap_insert(&myheap, 7, NULL);
-    heap_print(myheap);
+    for (int i = 100; i>0; i-=2){
+        heap_insert(&myheap, i, NULL);
+    }
+    elem* mine = heap_insert(&myheap, 77, NULL);
+    heap_decrease_key(&myheap, mine, 33);
+    mine = heap_insert(&myheap, 67, NULL);
+    heap_decrease_key(&myheap, mine, 23);
+    mine = heap_insert(&myheap, 43, NULL);
+    heap_delete(&myheap, mine);
     while (!is_empty(myheap)){
         print_data(heap_extract_min(&myheap));
     }
