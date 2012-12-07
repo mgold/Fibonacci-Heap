@@ -31,14 +31,11 @@ void node_kill(node* toKill){
 }
 
 void node_add(node* old, node* newRight){
-    assert(old != newRight);
     node* oldRight = old->right;
-    assert((oldRight->right != oldRight) || (old == oldRight));
+    assert(old != newRight);
+    assert(oldRight != newRight);
     old->right = newRight;
     oldRight->left = newRight;
     newRight->left = old;
     newRight->right = oldRight;
-    assert(oldRight->right != oldRight);
-    assert(newRight->right != newRight);
-    assert(old->right != old);
 }

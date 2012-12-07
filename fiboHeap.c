@@ -37,6 +37,8 @@ elem* heap_add(heap** H, node* newNode){
             *H = newNode;
         }
     }else{ //previously empty heap
+        newNode->left = newNode;
+        newNode->right = newNode;
         *H = newNode;
     }
     return newNode;
@@ -71,8 +73,6 @@ data  heap_extract_min(heap** H){
         }
         first->parent = NULL;
         *H = heap_union(*H, first);
-        fprintf(stderr, "After union\n");
-        heap_print(*H);
     }
     heap_consolidate(H);
     return d;
@@ -91,10 +91,10 @@ void  heap_remove_from(heap** H, node* x){
     x->right = x;
 }
 void  heap_consolidate(heap** H){
-    fprintf(stderr, "Entering consolidate\n");
+    node* x = *H;
+    if (!x) return;
     node** A = calloc(100, sizeof(node));
     memset(A, '\0', 100);
-    node* x = *H;
     assert(x->degree >= 0);
     node* last = x->left;
     while(x != last){
@@ -103,25 +103,24 @@ void  heap_consolidate(heap** H){
         x = next;
     }
     heap_match_degrees(H, A, last);
+    for (int i=0; i<100; i++){
+        if (A[i]){
+        }else{
+        }
+    }
     *H = heap_init();
     for (int i=0; i<100; i++){
         if (A[i]){
             heap_add(H, A[i]);
         }
     }
-    fprintf(stderr, "ll, l, x, r rr rrr: %d %d %d %d %d %d\n",
-        x->left->left->key, x->left->key, x->key, x->right->key,
-        x->right->right->key, x->right->right->right->key); 
     free(A);
-    heap_print(*H);
-    fprintf(stderr, "Exiting consolidate\n");
 }
 
 void heap_match_degrees(heap** H, node** A, node* x){
     int d = x->degree;
     while(A[d]){
-        if (d > 90){
-            fprintf(stderr, "Bad d: %d on node %d", d, x->key);
+        if (d > 99){
             exit(1);
         }
         node* y = A[d];
@@ -142,8 +141,6 @@ node* heap_link(heap** H, node* x, node* y){
     if (x->key > y->key){
         return heap_link(H, y, x);
     }
-    heap_print(*H);
-    fprintf(stderr, "x: %d[%d] y: %d[%d]\n", x->key, x->degree, y->key, y->degree);
     heap_remove_from(H, y);
     if (x->kid){
         node* z = x->kid;
@@ -156,8 +153,6 @@ node* heap_link(heap** H, node* x, node* y){
     x->kid = y;
     x->degree++;
     y->hasLostKid = 0;
-    heap_print(*H);
-    fprintf(stderr, "\n");
     return x;
 }
 

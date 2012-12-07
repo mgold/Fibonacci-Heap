@@ -10,9 +10,12 @@ int main(){
     heap_insert(&myheap, 3, NULL);
     heap_insert(&myheap, 8, NULL);
     heap_insert(&myheap, 2, NULL);
+    heap_insert(&myheap, 5, NULL);
     heap_insert(&myheap, 6, NULL);
     heap_insert(&myheap, 1, NULL);
     heap_insert(&myheap, 9, NULL);
+    heap_insert(&myheap, 4, NULL);
+    heap_insert(&myheap, 7, NULL);
     heap_print(myheap);
     while (!is_empty(myheap)){
         print_data(heap_extract_min(&myheap));
