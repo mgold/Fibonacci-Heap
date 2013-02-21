@@ -11,8 +11,8 @@ making them often undesirable in practice. Fibonacci heaps were designed in the
 
 This project was completed as part of my undergraduate coursework and is placed
 here with permission of the instructor. The full academic writeup is available
-in LaTeX and PDF format, and describes the performance of the Fibonacci heap
-against a naive, array-based heap. The file `use.h` determines which heap will
-be used.
+in LaTeX format, and describes the performance of the Fibonacci heap against a
+naive, array-based heap. It can be compiled using `gnuplot plots.p && pdflatex
+README.tex`. The file `use.h` determines which heap will be used.
 
 Copyright 2012 Max Goldstein. No license granted.
